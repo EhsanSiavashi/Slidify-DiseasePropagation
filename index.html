@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Disease Propagation</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Disease Propagation">
+  <meta name="author" content="Ehsan Siavashi">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Disease Propagation</h1>
+    <h2>using CIM model</h2>
+    <p>Ehsan Siavashi<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>What the app does?</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>This is an application which models disease propagation is a network of 31 people using the Conditional Influence Model. It has the following properties:</p>
+
+<ul>
+<li>The disease is contagous.</li>
+<li>People influence each other due to physical contact.</li>
+<li>The disease is fatal.</li>
+<li>There is immunization. If someone gets imminization, he/she will not get the disease again.</li>
+</ul>
+
+<p>The following code shows the </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>How to find who gets the disease?</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>I have applied the following code for calculating the probabilities for getting sick in the next step:</p>
+
+<pre><code class="r">C &lt;- matrix(0, N, N)
+for (i in 1:N) {
+        for (j in 1:N) {
+                if(i==j){
+                        C[i,j] &lt;- 1
+                }else
+                        # Node i gets influenced by node j iff i is H and j is I.
+                        C[i,j] &lt;- S[3*(i-1)+1]*S[3*(j-1)+2]
+        }
+}
+# transpose of E (E_t): Refer to the paper for the formula.
+E_t &lt;- t(D) * t(C) + diag(1,N,N) * (D %*% (matrix(1,N,N)-t(C)))
+
+# Calculating A_0  
+A_0 &lt;- cbind(MC2,matrix(0,3,3*N-3))
+O &lt;- matrix(0,3,3)
+for (i in 2:N) {
+        A &lt;- O
+        for (j in 2:N) {
+                if(i==j &amp;&amp; (i %in% Inf.list)){
+                        A&lt;-cbind(A, E_t[i,i]*MC2)
+                }
+                else if(i==j){
+                        A&lt;-cbind(A, E_t[i,i]*MC1) 
+                }else{
+                        A&lt;-cbind(A,O)
+                }
+        }
+        A_0 &lt;- rbind(A_0,A)
+}
+
+H &lt;- A_0 + kronecker(E_t - (diag(1, N,N)*E_t), input$DI)
+
+P &lt;- S %*% H
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>The input/output</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Users can input the number of people infected and also the amount of influences between nodes by changing the Markov chain matrices. Select the parameter and the app will provide a table and a graph of the number of infected, healthy and dead prople for a period of 30 time steps. Copy right researved for the author.</p>
+
+<h1>Thank you for your attention!</h1>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='What the app does?'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='How to find who gets the disease?'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='The input/output'>
+         3
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
